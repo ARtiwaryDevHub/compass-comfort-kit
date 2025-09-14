@@ -41,7 +41,7 @@ export const Navigation = ({ className }: NavigationProps) => {
           <div className="flex items-center space-x-2 mr-4">
             <Shield className="h-8 w-8 text-primary" />
             <div>
-              <h1 className="text-lg font-bold text-foreground">SafeTravel</h1>
+              <h1 className="text-lg font-bold text-foreground">SurakshaSetu</h1>
               <p className="text-xs text-muted-foreground">Your safety companion</p>
             </div>
           </div>
