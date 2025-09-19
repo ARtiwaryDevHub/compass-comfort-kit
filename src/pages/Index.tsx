@@ -75,7 +75,7 @@ const Index = () => {
           <div className="lg:col-span-2 space-y-6">
             {/* Safety Overview */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <SafetyMeter score={safetyScore} location="Central Park Area, NYC" />
+              <SafetyMeter />
               <LocationDisplay />
             </div>
 

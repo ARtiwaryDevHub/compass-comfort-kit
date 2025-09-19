@@ -1,102 +1,14 @@
-import { useState, useEffect } from "react";
 import { MapPin, Navigation, Wifi, WifiOff } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useLocation } from "@/contexts/LocationContext";
 
 interface LocationDisplayProps {
   className?: string;
 }
 
 export const LocationDisplay = ({ className }: LocationDisplayProps) => {
-  const [location, setLocation] = useState<{
-    latitude: number;
-    longitude: number;
-    accuracy?: number;
-  } | null>(null);
-  const [address, setAddress] = useState<string>("Locating...");
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [isTracking, setIsTracking] = useState(false);
-
-  const reverseGeocode = async (lat: number, lon: number) => {
-    try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1&accept-language=en`
-      );
-      const data = await response.json();
-      
-      if (data && data.display_name) {
-        // Format address for Indian context
-        const address = data.address;
-        let formattedAddress = "";
-        
-        if (address) {
-          const parts = [];
-          if (address.road || address.street) parts.push(address.road || address.street);
-          if (address.suburb || address.neighbourhood) parts.push(address.suburb || address.neighbourhood);
-          if (address.city || address.town || address.village) parts.push(address.city || address.town || address.village);
-          if (address.state_district) parts.push(address.state_district);
-          if (address.state) parts.push(address.state);
-          if (address.postcode) parts.push(address.postcode);
-          
-          formattedAddress = parts.length > 0 ? parts.join(", ") : data.display_name;
-        } else {
-          formattedAddress = data.display_name;
-        }
-        
-        setAddress(formattedAddress);
-      } else {
-        setAddress(`${lat.toFixed(4)}, ${lon.toFixed(4)}`);
-      }
-    } catch (error) {
-      console.error("Reverse geocoding error:", error);
-      setAddress(`${lat.toFixed(4)}, ${lon.toFixed(4)}`);
-    }
-  };
-
-  useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
-    
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-    
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
-
-  useEffect(() => {
-    if ("geolocation" in navigator) {
-      const watchId = navigator.geolocation.watchPosition(
-        (position) => {
-          setLocation({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            accuracy: position.coords.accuracy,
-          });
-          setIsTracking(true);
-          
-          // Real reverse geocoding using Nominatim (OpenStreetMap)
-          reverseGeocode(position.coords.latitude, position.coords.longitude);
-        },
-        (error) => {
-          console.error("Geolocation error:", error);
-          setAddress("Location unavailable");
-          setIsTracking(false);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 60000,
-        }
-      );
-
-      return () => navigator.geolocation.clearWatch(watchId);
-    } else {
-      setAddress("Geolocation not supported");
-    }
-  }, []);
+  const { location, address, isTracking, isOnline, error, refreshLocation } = useLocation();
 
   const getAccuracyText = (accuracy?: number) => {
     if (!accuracy) return "Unknown";
@@ -104,29 +16,6 @@ export const LocationDisplay = ({ className }: LocationDisplayProps) => {
     if (accuracy < 50) return "High";
     if (accuracy < 100) return "Medium";
     return "Low";
-  };
-
-  const refreshLocation = () => {
-    if ("geolocation" in navigator) {
-      setAddress("Updating location...");
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLocation({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            accuracy: position.coords.accuracy,
-          });
-          
-          // Real reverse geocoding for updated location
-          reverseGeocode(position.coords.latitude, position.coords.longitude);
-        },
-        (error) => {
-          console.error("Location refresh error:", error);
-          setAddress("Unable to update location");
-        },
-        { enableHighAccuracy: true }
-      );
-    }
   };
 
   return (
