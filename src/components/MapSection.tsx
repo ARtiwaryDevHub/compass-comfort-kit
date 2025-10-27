@@ -1,98 +1,139 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MapPin, Navigation, Layers, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { MapPin, Navigation } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useLocation } from "@/contexts/LocationContext";
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 
 interface MapSectionProps {
   className?: string;
 }
 
 export const MapSection = ({ className }: MapSectionProps) => {
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const map = useRef<mapboxgl.Map | null>(null);
+  const marker = useRef<mapboxgl.Marker | null>(null);
+  const { location } = useLocation();
+  const [mapboxToken, setMapboxToken] = useState("");
+  const [isMapReady, setIsMapReady] = useState(false);
+
+  useEffect(() => {
+    if (!mapContainer.current || !mapboxToken || isMapReady) return;
+
+    try {
+      mapboxgl.accessToken = mapboxToken;
+      
+      const initialCenter: [number, number] = location 
+        ? [location.longitude, location.latitude]
+        : [78.9629, 20.5937]; // Center of India as default
+
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/streets-v12',
+        center: initialCenter,
+        zoom: 13,
+      });
+
+      map.current.addControl(
+        new mapboxgl.NavigationControl(),
+        'top-right'
+      );
+
+      setIsMapReady(true);
+    } catch (error) {
+      console.error("Error initializing map:", error);
+    }
+
+    return () => {
+      map.current?.remove();
+      setIsMapReady(false);
+    };
+  }, [mapboxToken]);
+
+  useEffect(() => {
+    if (!map.current || !isMapReady || !location) return;
+
+    if (marker.current) {
+      marker.current.setLngLat([location.longitude, location.latitude]);
+    } else {
+      const el = document.createElement('div');
+      el.className = 'custom-marker';
+      el.style.width = '30px';
+      el.style.height = '30px';
+      el.style.borderRadius = '50%';
+      el.style.backgroundColor = 'hsl(var(--emergency))';
+      el.style.border = '3px solid white';
+      el.style.boxShadow = '0 0 10px rgba(0,0,0,0.3)';
+
+      marker.current = new mapboxgl.Marker(el)
+        .setLngLat([location.longitude, location.latitude])
+        .addTo(map.current);
+    }
+
+    map.current.flyTo({
+      center: [location.longitude, location.latitude],
+      zoom: 15,
+      duration: 1000
+    });
+  }, [location, isMapReady]);
+
+  const handleCenterOnLocation = () => {
+    if (map.current && location) {
+      map.current.flyTo({
+        center: [location.longitude, location.latitude],
+        zoom: 16,
+        duration: 1500
+      });
+    }
+  };
+
   return (
     <Card className={`relative bg-card border-border shadow-lg overflow-hidden ${className}`}>
-      {/* Map Controls */}
-      <div className="absolute top-4 left-4 z-10 flex flex-col space-y-2">
-        <Button variant="secondary" size="sm" className="h-10 w-10 p-0 shadow-md">
-          <Search className="h-4 w-4" />
-        </Button>
-        <Button variant="secondary" size="sm" className="h-10 w-10 p-0 shadow-md">
-          <Layers className="h-4 w-4" />
-        </Button>
-      </div>
-
-      <div className="absolute top-4 right-4 z-10">
-        <Button variant="secondary" size="sm" className="shadow-md">
-          <Navigation className="h-4 w-4 mr-2" />
-          My Location
-        </Button>
-      </div>
-
-      {/* Mock Map Display */}
-      <div className="h-64 bg-gradient-to-br from-primary/5 to-secondary/10 relative">
-        {/* Grid Pattern */}
-        <div 
-          className="absolute inset-0 opacity-20"
-          style={{
-            backgroundImage: `
-              linear-gradient(hsl(var(--border)) 1px, transparent 1px),
-              linear-gradient(90deg, hsl(var(--border)) 1px, transparent 1px)
-            `,
-            backgroundSize: '20px 20px'
-          }}
-        />
-        
-        {/* Mock Streets */}
-        <div className="absolute inset-0">
-          <div className="absolute top-16 left-8 right-8 h-1 bg-muted rounded"></div>
-          <div className="absolute top-32 left-12 right-4 h-1 bg-muted rounded"></div>
-          <div className="absolute left-16 top-8 bottom-8 w-1 bg-muted rounded"></div>
-          <div className="absolute left-32 top-12 bottom-4 w-1 bg-muted rounded"></div>
-        </div>
-
-        {/* Mock Points of Interest */}
-        <div className="absolute top-12 left-20">
-          <div className="w-3 h-3 bg-safe rounded-full shadow-md animate-pulse-safe"></div>
-          <div className="text-xs text-safe-foreground mt-1 font-medium">Safe Zone</div>
-        </div>
-        
-        <div className="absolute top-20 right-16">
-          <div className="w-3 h-3 bg-caution rounded-full shadow-md"></div>
-          <div className="text-xs text-caution-foreground mt-1 font-medium">Busy Area</div>
-        </div>
-        
-        <div className="absolute bottom-16 left-24">
-          <div className="w-3 h-3 bg-primary rounded-full shadow-md"></div>
-          <div className="text-xs text-primary-foreground mt-1 font-medium">Tourist Info</div>
-        </div>
-
-        {/* Your Location */}
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <div className="relative">
-            <div className="w-4 h-4 bg-emergency rounded-full shadow-lg border-2 border-white"></div>
-            <div className="absolute inset-0 w-4 h-4 bg-emergency rounded-full animate-ping opacity-30"></div>
-            <MapPin className="absolute -top-1 -left-1 h-6 w-6 text-emergency-foreground" />
+      {!mapboxToken ? (
+        <div className="h-64 p-6 flex flex-col items-center justify-center space-y-4">
+          <MapPin className="h-12 w-12 text-muted-foreground" />
+          <div className="text-center space-y-2">
+            <h3 className="font-semibold text-foreground">Enable Interactive Map</h3>
+            <p className="text-sm text-muted-foreground">
+              Enter your Mapbox public token to view the interactive map
+            </p>
+            <a 
+              href="https://mapbox.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-xs text-primary hover:underline"
+            >
+              Get a free token from Mapbox →
+            </a>
           </div>
-          <div className="text-xs text-center mt-2 font-medium text-emergency">You</div>
+          <Input
+            type="text"
+            placeholder="pk.eyJ1..."
+            value={mapboxToken}
+            onChange={(e) => setMapboxToken(e.target.value)}
+            className="max-w-md"
+          />
         </div>
-
-        {/* Legend */}
-        <div className="absolute bottom-4 left-4 bg-card/90 backdrop-blur-sm p-3 rounded-lg shadow-md">
-          <div className="text-xs font-medium text-foreground mb-2">Legend</div>
-          <div className="space-y-1 text-xs">
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-safe rounded-full"></div>
-              <span className="text-muted-foreground">Safe Areas</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-caution rounded-full"></div>
-              <span className="text-muted-foreground">Caution Zones</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-emergency rounded-full"></div>
-              <span className="text-muted-foreground">Your Location</span>
-            </div>
+      ) : (
+        <>
+          <div className="absolute top-4 right-4 z-10">
+            <Button 
+              variant="secondary" 
+              size="sm" 
+              className="shadow-md"
+              onClick={handleCenterOnLocation}
+              disabled={!location}
+            >
+              <Navigation className="h-4 w-4 mr-2" />
+              My Location
+            </Button>
           </div>
-        </div>
-      </div>
+
+          <div ref={mapContainer} className="h-64 w-full" />
+        </>
+      )}
     </Card>
   );
 };
