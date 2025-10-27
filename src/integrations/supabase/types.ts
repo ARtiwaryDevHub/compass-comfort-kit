@@ -14,7 +14,141 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tourist_activities: {
+        Row: {
+          activity_data: Json | null
+          activity_type: Database["public"]["Enums"]["activity_type"]
+          created_at: string
+          id: string
+          location_lat: number | null
+          location_lng: number | null
+          location_name: string | null
+          tourist_id: string
+          user_id: string
+        }
+        Insert: {
+          activity_data?: Json | null
+          activity_type: Database["public"]["Enums"]["activity_type"]
+          created_at?: string
+          id?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          location_name?: string | null
+          tourist_id: string
+          user_id: string
+        }
+        Update: {
+          activity_data?: Json | null
+          activity_type?: Database["public"]["Enums"]["activity_type"]
+          created_at?: string
+          id?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          location_name?: string | null
+          tourist_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tourist_contacts: {
+        Row: {
+          created_at: string
+          id: string
+          is_emergency: boolean | null
+          name: string
+          phone: string
+          relationship: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_emergency?: boolean | null
+          name: string
+          phone: string
+          relationship?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_emergency?: boolean | null
+          name?: string
+          phone?: string
+          relationship?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tourist_help_requests: {
+        Row: {
+          created_at: string
+          id: string
+          location_lat: number | null
+          location_lng: number | null
+          message: string
+          request_type: string
+          response: string | null
+          status: string | null
+          tourist_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          message: string
+          request_type: string
+          response?: string | null
+          status?: string | null
+          tourist_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          message?: string
+          request_type?: string
+          response?: string | null
+          status?: string | null
+          tourist_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +157,13 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      activity_type:
+        | "voice_help"
+        | "text_help"
+        | "contact_family"
+        | "find_nearby"
+        | "sos_alert"
+        | "location_update"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +290,15 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      activity_type: [
+        "voice_help",
+        "text_help",
+        "contact_family",
+        "find_nearby",
+        "sos_alert",
+        "location_update",
+      ],
+    },
   },
 } as const
