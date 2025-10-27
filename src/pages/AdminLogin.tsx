@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Shield, Lock, ArrowLeft, Smartphone, Eye, EyeOff } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 
 const AdminLogin = () => {
@@ -58,9 +59,12 @@ const AdminLogin = () => {
                 <p className="text-xs text-muted-foreground">Authority Portal</p>
               </div>
             </div>
-            <div className="flex items-center space-x-1 px-2 py-1 bg-emergency/10 rounded-full">
-              <Lock className="h-3 w-3 text-emergency" />
-              <span className="text-xs text-emergency-foreground">Secure Access</span>
+            <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1 px-2 py-1 bg-emergency/10 rounded-full">
+                <Lock className="h-3 w-3 text-emergency" />
+                <span className="text-xs text-emergency-foreground">Secure Access</span>
+              </div>
+              <ThemeToggle />
             </div>
           </div>
         </div>

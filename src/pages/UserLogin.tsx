@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Shield, User, Mail, Phone, Upload, CheckCircle, ArrowLeft, Lock, Globe } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 
 const UserLogin = () => {
@@ -74,9 +75,12 @@ const UserLogin = () => {
                 <p className="text-xs text-muted-foreground">Tourist Portal</p>
               </div>
             </div>
-            <div className="flex items-center space-x-1 px-2 py-1 bg-safe/10 rounded-full">
-              <Lock className="h-3 w-3 text-safe" />
-              <span className="text-xs text-safe-foreground">Secure</span>
+            <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1 px-2 py-1 bg-safe/10 rounded-full">
+                <Lock className="h-3 w-3 text-safe" />
+                <span className="text-xs text-safe-foreground">Secure</span>
+              </div>
+              <ThemeToggle />
             </div>
           </div>
         </div>

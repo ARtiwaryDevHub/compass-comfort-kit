@@ -23,6 +23,7 @@ import {
   Lock,
   Globe
 } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 
 const AdminDashboard = () => {
@@ -129,10 +130,13 @@ const AdminDashboard = () => {
                 </div>
               </div>
               
-              <Button variant="outline" size="sm">
-                <FileText className="h-4 w-4 mr-2" />
-                Logout
-              </Button>
+              <div className="flex items-center space-x-2">
+                <ThemeToggle />
+                <Button variant="outline" size="sm">
+                  <FileText className="h-4 w-4 mr-2" />
+                  Logout
+                </Button>
+              </div>
             </div>
           </div>
         </div>

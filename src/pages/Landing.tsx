@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Shield, Users, Lock, MapPin, Smartphone, Globe } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import heroImage from "@/assets/hero-safety.jpg";
 
 const Landing = () => {
@@ -46,6 +47,7 @@ const Landing = () => {
                 <Lock className="h-4 w-4 text-safe" />
                 <span className="text-xs font-medium text-safe-foreground">Blockchain Secured</span>
               </div>
+              <ThemeToggle />
             </div>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { 
   Home, 
   MapPin, 
@@ -85,6 +86,7 @@ export const Navigation = ({ className }: NavigationProps) => {
               <span className="text-xs">{action.label}</span>
             </Button>
           ))}
+          <ThemeToggle />
         </div>
       </div>
 
