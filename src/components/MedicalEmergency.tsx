@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Send, Package, Bandage, Pill, Thermometer, Heart, AlertCircle, Mic, MicOff } from "lucide-react";
+import { Loader2, Send, Package, Bandage, Pill, Thermometer, Heart, AlertCircle, Mic, MicOff, ChevronDown, Stethoscope, Phone } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
@@ -174,24 +174,31 @@ export const MedicalEmergency = ({ className }: MedicalEmergencyProps) => {
   };
 
   return (
-    <Card className={`bg-card border-border shadow-lg ${className}`}>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Heart className="h-5 w-5 text-emergency" />
+    <Card className={`bg-card border-border shadow-lg hover:shadow-xl transition-all duration-300 ${className}`}>
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center gap-2 text-xl">
+          <div className="p-2 bg-emergency/10 rounded-lg">
+            <Heart className="h-6 w-6 text-emergency animate-pulse" />
+          </div>
           Medical Emergency Assistance
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-base">
           Get AI-powered first aid guidance and emergency assistance
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Accordion type="single" collapsible className="w-full">
+        <Accordion type="single" collapsible className="w-full space-y-2">
           {/* AI Emergency Chat Section */}
-          <AccordionItem value="ai-assistant">
-            <AccordionTrigger className="text-sm font-semibold">
-              Emergency AI Assistant
+          <AccordionItem value="ai-assistant" className="border border-border rounded-lg overflow-hidden hover:border-primary/50 transition-colors">
+            <AccordionTrigger className="px-4 py-3 hover:bg-muted/50 transition-colors group">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                  <Stethoscope className="h-5 w-5 text-primary" />
+                </div>
+                <span className="text-sm font-semibold">Emergency AI Assistant</span>
+              </div>
             </AccordionTrigger>
-            <AccordionContent className="space-y-3 pt-2">
+            <AccordionContent className="px-4 pb-4 space-y-3 animate-in slide-in-from-top-2 duration-300">
               <div className="flex gap-2">
                 <Input
                   placeholder="Describe your emergency (e.g., 'burn', 'choking', 'chest pain')..."
@@ -199,17 +206,19 @@ export const MedicalEmergency = ({ className }: MedicalEmergencyProps) => {
                   onChange={(e) => setMessage(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                   disabled={isLoading || isRecording || isTranscribing}
+                  className="transition-all duration-200 focus:ring-2 focus:ring-primary"
                 />
                 <Button 
                   onClick={isRecording ? stopRecording : startRecording}
                   disabled={isLoading || isTranscribing}
                   size="icon"
                   variant={isRecording ? "destructive" : "secondary"}
+                  className="hover:scale-105 transition-transform duration-200"
                 >
                   {isTranscribing ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : isRecording ? (
-                    <MicOff className="h-4 w-4" />
+                    <MicOff className="h-4 w-4 animate-pulse" />
                   ) : (
                     <Mic className="h-4 w-4" />
                   )}
@@ -218,6 +227,7 @@ export const MedicalEmergency = ({ className }: MedicalEmergencyProps) => {
                   onClick={handleSendMessage} 
                   disabled={isLoading || !message.trim() || isRecording || isTranscribing}
                   size="icon"
+                  className="hover:scale-105 transition-transform duration-200"
                 >
                   {isLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -228,45 +238,55 @@ export const MedicalEmergency = ({ className }: MedicalEmergencyProps) => {
               </div>
               
               {isRecording && (
-                <div className="flex items-center gap-2 p-2 bg-destructive/10 rounded-lg">
+                <div className="flex items-center gap-2 p-3 bg-destructive/10 rounded-lg border border-destructive/20 animate-in fade-in duration-200">
                   <div className="w-2 h-2 bg-destructive rounded-full animate-pulse" />
-                  <p className="text-xs text-foreground">Recording... Click mic to stop</p>
+                  <p className="text-xs text-foreground font-medium">Recording... Click mic to stop</p>
                 </div>
               )}
               
               {isTranscribing && (
-                <div className="flex items-center gap-2 p-2 bg-primary/10 rounded-lg">
+                <div className="flex items-center gap-2 p-3 bg-primary/10 rounded-lg border border-primary/20 animate-in fade-in duration-200">
                   <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                  <p className="text-xs text-foreground">Transcribing your message...</p>
+                  <p className="text-xs text-foreground font-medium">Transcribing your message...</p>
                 </div>
               )}
               
               {response && (
-                <div className="p-4 bg-muted rounded-lg border border-border">
-                  <p className="text-sm text-foreground whitespace-pre-wrap">{response}</p>
+                <div className="p-4 bg-muted rounded-lg border border-border animate-in slide-in-from-bottom-2 duration-300">
+                  <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">{response}</p>
                 </div>
               )}
               
               {!response && !isLoading && !isRecording && !isTranscribing && (
-                <p className="text-xs text-muted-foreground">
-                  ⚠️ For life-threatening emergencies, call 112 (National Emergency) or 102 (Ambulance) immediately
-                </p>
+                <div className="p-3 bg-emergency/5 rounded-lg border border-emergency/20">
+                  <p className="text-xs text-muted-foreground">
+                    ⚠️ For life-threatening emergencies, call <strong className="text-emergency">112</strong> (National Emergency) or <strong className="text-emergency">102</strong> (Ambulance) immediately
+                  </p>
+                </div>
               )}
             </AccordionContent>
           </AccordionItem>
 
           {/* First Aid Kit Section */}
-          <AccordionItem value="first-aid">
-            <AccordionTrigger className="text-sm font-semibold">
-              Essential First Aid Kit
+          <AccordionItem value="first-aid" className="border border-border rounded-lg overflow-hidden hover:border-primary/50 transition-colors">
+            <AccordionTrigger className="px-4 py-3 hover:bg-muted/50 transition-colors group">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-safe/10 rounded-lg group-hover:bg-safe/20 transition-colors">
+                  <Package className="h-5 w-5 text-safe" />
+                </div>
+                <span className="text-sm font-semibold">Essential First Aid Kit</span>
+              </div>
             </AccordionTrigger>
-            <AccordionContent className="space-y-3 pt-2">
+            <AccordionContent className="px-4 pb-4 space-y-3 animate-in slide-in-from-top-2 duration-300">
               <div className="grid grid-cols-1 gap-3">
                 {firstAidKit.map((item, index) => (
-                  <div key={index} className="p-3 bg-muted rounded-lg border border-border hover:border-primary/50 transition-colors">
+                  <div 
+                    key={index} 
+                    className="p-3 bg-muted rounded-lg border border-border hover:border-primary/50 hover:shadow-md transition-all duration-200 cursor-pointer group hover:scale-[1.02]"
+                  >
                     <div className="flex items-start gap-3">
-                      <div className="mt-1">
-                        <item.icon className="h-5 w-5 text-primary" />
+                      <div className="mt-1 p-2 bg-background rounded-lg group-hover:bg-primary/10 transition-colors">
+                        <item.icon className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
                       </div>
                       <div className="flex-1 space-y-1">
                         <div className="flex items-center gap-2">
@@ -287,38 +307,82 @@ export const MedicalEmergency = ({ className }: MedicalEmergencyProps) => {
           </AccordionItem>
 
           {/* Emergency Numbers Section */}
-          <AccordionItem value="emergency-numbers">
-            <AccordionTrigger className="text-sm font-semibold">
-              India Emergency Contact Numbers
+          <AccordionItem value="emergency-numbers" className="border border-border rounded-lg overflow-hidden hover:border-emergency/50 transition-colors">
+            <AccordionTrigger className="px-4 py-3 hover:bg-muted/50 transition-colors group">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-emergency/10 rounded-lg group-hover:bg-emergency/20 transition-colors">
+                  <Phone className="h-5 w-5 text-emergency" />
+                </div>
+                <span className="text-sm font-semibold">India Emergency Contact Numbers</span>
+              </div>
             </AccordionTrigger>
-            <AccordionContent className="pt-2">
+            <AccordionContent className="px-4 pb-4 space-y-3 animate-in slide-in-from-top-2 duration-300">
               <div className="space-y-3">
-                <div className="p-3 bg-emergency/10 border border-emergency/20 rounded-lg">
-                  <p className="text-xs font-medium text-foreground mb-2">🇮🇳 National Emergency Services:</p>
-                  <div className="space-y-1 text-xs text-muted-foreground">
-                    <p>📞 Emergency (All): <strong>112</strong></p>
-                    <p>🚑 Ambulance: <strong>102</strong></p>
-                    <p>🚓 Police: <strong>100</strong></p>
-                    <p>🚒 Fire: <strong>101</strong></p>
-                    <p>🚨 Women Helpline: <strong>1091</strong></p>
-                    <p>👶 Child Helpline: <strong>1098</strong></p>
+                <div className="p-4 bg-emergency/10 border border-emergency/20 rounded-lg hover:shadow-md transition-all duration-200 hover:scale-[1.02] cursor-pointer">
+                  <p className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+                    🇮🇳 National Emergency Services
+                  </p>
+                  <div className="space-y-2 text-sm">
+                    <p className="flex items-center justify-between hover:text-emergency transition-colors">
+                      <span>📞 Emergency (All)</span>
+                      <strong className="text-emergency">112</strong>
+                    </p>
+                    <p className="flex items-center justify-between hover:text-emergency transition-colors">
+                      <span>🚑 Ambulance</span>
+                      <strong className="text-emergency">102</strong>
+                    </p>
+                    <p className="flex items-center justify-between hover:text-emergency transition-colors">
+                      <span>🚓 Police</span>
+                      <strong className="text-emergency">100</strong>
+                    </p>
+                    <p className="flex items-center justify-between hover:text-emergency transition-colors">
+                      <span>🚒 Fire</span>
+                      <strong className="text-emergency">101</strong>
+                    </p>
+                    <p className="flex items-center justify-between hover:text-emergency transition-colors">
+                      <span>🚨 Women Helpline</span>
+                      <strong className="text-emergency">1091</strong>
+                    </p>
+                    <p className="flex items-center justify-between hover:text-emergency transition-colors">
+                      <span>👶 Child Helpline</span>
+                      <strong className="text-emergency">1098</strong>
+                    </p>
                   </div>
                 </div>
                 
-                <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg">
-                  <p className="text-xs font-medium text-foreground mb-2">🏥 Medical Services:</p>
-                  <div className="space-y-1 text-xs text-muted-foreground">
-                    <p>☎️ National Health Helpline: <strong>1800-180-1104</strong></p>
-                    <p>🧠 Mental Health: <strong>08046110007</strong></p>
-                    <p>☠️ Poison Control: <strong>1800-11-4000</strong></p>
+                <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg hover:shadow-md transition-all duration-200 hover:scale-[1.02] cursor-pointer">
+                  <p className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+                    🏥 Medical Services
+                  </p>
+                  <div className="space-y-2 text-sm">
+                    <p className="flex items-center justify-between hover:text-primary transition-colors">
+                      <span>☎️ National Health</span>
+                      <strong className="text-primary">1800-180-1104</strong>
+                    </p>
+                    <p className="flex items-center justify-between hover:text-primary transition-colors">
+                      <span>🧠 Mental Health</span>
+                      <strong className="text-primary">08046110007</strong>
+                    </p>
+                    <p className="flex items-center justify-between hover:text-primary transition-colors">
+                      <span>☠️ Poison Control</span>
+                      <strong className="text-primary">1800-11-4000</strong>
+                    </p>
                   </div>
                 </div>
 
-                <div className="p-3 bg-accent/10 border border-accent/20 rounded-lg">
-                  <p className="text-xs font-medium text-foreground mb-2">🆘 Tourist Helpline:</p>
-                  <div className="space-y-1 text-xs text-muted-foreground">
-                    <p>🌍 Ministry of Tourism 24x7: <strong>1800-11-1363</strong></p>
-                    <p>📱 Incredible India: <strong>1363</strong></p>
+                <div className="p-4 bg-safe/10 border border-safe/20 rounded-lg hover:shadow-md transition-all duration-200 hover:scale-[1.02] cursor-pointer">
+                  <p className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+                    🆘 Tourist Helpline
+                  </p>
+                  <div className="space-y-2 text-sm">
+                    <p className="flex items-center justify-between hover:text-safe transition-colors">
+                      <span>🌍 Tourism 24x7</span>
+                      <strong className="text-safe">1800-11-1363</strong>
+                    </p>
+                    <p className="flex items-center justify-between hover:text-safe transition-colors">
+                      <span>📱 Incredible India</span>
+                      <strong className="text-safe">1363</strong>
+                    </p>
                   </div>
                 </div>
               </div>
