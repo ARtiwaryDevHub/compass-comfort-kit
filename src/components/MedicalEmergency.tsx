@@ -249,7 +249,7 @@ export const MedicalEmergency = ({ className }: MedicalEmergencyProps) => {
               
               {!response && !isLoading && !isRecording && !isTranscribing && (
                 <p className="text-xs text-muted-foreground">
-                  ⚠️ For life-threatening emergencies, call 911 (US) or 112 (EU) immediately
+                  ⚠️ For life-threatening emergencies, call 112 (National Emergency) or 102 (Ambulance) immediately
                 </p>
               )}
             </AccordionContent>
@@ -289,17 +289,37 @@ export const MedicalEmergency = ({ className }: MedicalEmergencyProps) => {
           {/* Emergency Numbers Section */}
           <AccordionItem value="emergency-numbers">
             <AccordionTrigger className="text-sm font-semibold">
-              Emergency Contact Numbers
+              India Emergency Contact Numbers
             </AccordionTrigger>
             <AccordionContent className="pt-2">
-              <div className="p-3 bg-emergency/10 border border-emergency/20 rounded-lg">
-                <p className="text-xs font-medium text-foreground mb-2">Global Emergency Numbers:</p>
-                <div className="space-y-1 text-xs text-muted-foreground">
-                  <p>🇺🇸 United States: 911</p>
-                  <p>🇪🇺 European Union: 112</p>
-                  <p>🇬🇧 United Kingdom: 999</p>
-                  <p>🇦🇺 Australia: 000</p>
-                  <p>🇮🇳 India: 112</p>
+              <div className="space-y-3">
+                <div className="p-3 bg-emergency/10 border border-emergency/20 rounded-lg">
+                  <p className="text-xs font-medium text-foreground mb-2">🇮🇳 National Emergency Services:</p>
+                  <div className="space-y-1 text-xs text-muted-foreground">
+                    <p>📞 Emergency (All): <strong>112</strong></p>
+                    <p>🚑 Ambulance: <strong>102</strong></p>
+                    <p>🚓 Police: <strong>100</strong></p>
+                    <p>🚒 Fire: <strong>101</strong></p>
+                    <p>🚨 Women Helpline: <strong>1091</strong></p>
+                    <p>👶 Child Helpline: <strong>1098</strong></p>
+                  </div>
+                </div>
+                
+                <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg">
+                  <p className="text-xs font-medium text-foreground mb-2">🏥 Medical Services:</p>
+                  <div className="space-y-1 text-xs text-muted-foreground">
+                    <p>☎️ National Health Helpline: <strong>1800-180-1104</strong></p>
+                    <p>🧠 Mental Health: <strong>08046110007</strong></p>
+                    <p>☠️ Poison Control: <strong>1800-11-4000</strong></p>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-accent/10 border border-accent/20 rounded-lg">
+                  <p className="text-xs font-medium text-foreground mb-2">🆘 Tourist Helpline:</p>
+                  <div className="space-y-1 text-xs text-muted-foreground">
+                    <p>🌍 Ministry of Tourism 24x7: <strong>1800-11-1363</strong></p>
+                    <p>📱 Incredible India: <strong>1363</strong></p>
+                  </div>
                 </div>
               </div>
             </AccordionContent>
