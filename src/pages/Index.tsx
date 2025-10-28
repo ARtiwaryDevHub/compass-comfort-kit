@@ -4,7 +4,7 @@ import { SafetyMeter } from "@/components/SafetyMeter";
 import { SOSButton } from "@/components/SOSButton";
 import { AlertsPanel } from "@/components/AlertsPanel";
 import { LocationDisplay } from "@/components/LocationDisplay";
-import { MapSection } from "@/components/MapSection";
+import { MedicalEmergency } from "@/components/MedicalEmergency";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Mic, MessageSquare, Users, Compass } from "lucide-react";
@@ -79,8 +79,8 @@ const Index = () => {
               <LocationDisplay />
             </div>
 
-            {/* Map Section */}
-            <MapSection />
+            {/* Medical Emergency Section */}
+            <MedicalEmergency />
 
             {/* Alerts Panel */}
             <AlertsPanel />
