@@ -19,10 +19,11 @@ import {
 
 interface NavigationProps {
   className?: string;
+  activeTab: string;
+  onTabChange: (tab: string) => void;
 }
 
-export const Navigation = ({ className }: NavigationProps) => {
-  const [activeTab, setActiveTab] = useState("home");
+export const Navigation = ({ className, activeTab, onTabChange }: NavigationProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isMobile = useIsMobile();
 
@@ -41,7 +42,7 @@ export const Navigation = ({ className }: NavigationProps) => {
   ];
 
   const handleNavClick = (id: string) => {
-    setActiveTab(id);
+    onTabChange(id);
     setMobileMenuOpen(false);
   };
 
@@ -67,7 +68,7 @@ export const Navigation = ({ className }: NavigationProps) => {
                   key={item.id}
                   variant={activeTab === item.id ? "default" : "ghost"}
                   size="sm"
-                  onClick={() => setActiveTab(item.id)}
+                  onClick={() => onTabChange(item.id)}
                   className={`relative h-auto py-2 px-3 flex-col ${
                     activeTab === item.id 
                       ? "bg-primary text-primary-foreground" 
