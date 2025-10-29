@@ -11,12 +11,24 @@ serve(async (req) => {
   }
 
   try {
-    const { message } = await req.json();
+    const { messages } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
+
+    // Build conversation history
+    const conversationMessages = [
+      { 
+        role: "system", 
+        content: "You are an emergency medical assistant for tourists. Provide clear, concise, and immediate first aid guidance. Always prioritize calling emergency services (112/102 in India) for serious situations. Keep responses brief and actionable. Remember previous context in the conversation to provide better follow-up assistance." 
+      },
+      ...messages.map((msg: any) => ({
+        role: msg.role,
+        content: msg.content
+      }))
+    ];
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -26,13 +38,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
-        messages: [
-          { 
-            role: "system", 
-            content: "You are an emergency medical assistant for tourists. Provide clear, concise, and immediate first aid guidance. Always prioritize calling emergency services (911/112) for serious situations. Keep responses brief and actionable." 
-          },
-          { role: "user", content: message }
-        ],
+        messages: conversationMessages,
       }),
     });
 

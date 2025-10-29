@@ -58,31 +58,44 @@ const firstAidKit: FirstAidItem[] = [
   }
 ];
 
+interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
 export const MedicalEmergency = ({ className }: MedicalEmergencyProps) => {
   const [message, setMessage] = useState("");
-  const [response, setResponse] = useState("");
+  const [conversation, setConversation] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const conversationEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   const handleSendMessage = async () => {
     if (!message.trim()) return;
 
+    const userMessage: ChatMessage = { role: "user", content: message.trim() };
+    setConversation(prev => [...prev, userMessage]);
+    setMessage("");
     setIsLoading(true);
-    setResponse("");
 
     try {
       const { data, error } = await supabase.functions.invoke("medical-chat", {
-        body: { message }
+        body: { messages: [...conversation, userMessage] }
       });
 
       if (error) throw error;
 
-      setResponse(data.response);
-      setMessage("");
+      const assistantMessage: ChatMessage = { role: "assistant", content: data.response };
+      setConversation(prev => [...prev, assistantMessage]);
+      
+      // Scroll to bottom
+      setTimeout(() => {
+        conversationEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
     } catch (error) {
       console.error("Error:", error);
       toast({
@@ -90,6 +103,8 @@ export const MedicalEmergency = ({ className }: MedicalEmergencyProps) => {
         description: "Failed to get medical assistance. Please try again.",
         variant: "destructive"
       });
+      // Remove the user message if there was an error
+      setConversation(prev => prev.slice(0, -1));
     } finally {
       setIsLoading(false);
     }
@@ -199,9 +214,45 @@ export const MedicalEmergency = ({ className }: MedicalEmergencyProps) => {
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-4 pb-4 space-y-3 animate-in slide-in-from-top-2 duration-300">
+              {/* Conversation Display */}
+              {conversation.length > 0 && (
+                <div className="max-h-[400px] overflow-y-auto space-y-3 mb-3 p-3 bg-background rounded-lg border border-border">
+                  {conversation.map((msg, idx) => (
+                    <div 
+                      key={idx}
+                      className={`p-3 rounded-lg ${
+                        msg.role === "user" 
+                          ? "bg-primary/10 border border-primary/20 ml-8" 
+                          : "bg-muted border border-border mr-8"
+                      } animate-in slide-in-from-bottom-2 duration-300`}
+                    >
+                      <div className="flex items-start gap-2">
+                        <div className={`p-1 rounded-full ${msg.role === "user" ? "bg-primary" : "bg-emergency"}`}>
+                          {msg.role === "user" ? (
+                            <AlertCircle className="h-3 w-3 text-white" />
+                          ) : (
+                            <Stethoscope className="h-3 w-3 text-white" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-xs font-semibold mb-1 text-foreground">
+                            {msg.role === "user" ? "You" : "AI Assistant"}
+                          </p>
+                          <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">
+                            {msg.content}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  <div ref={conversationEndRef} />
+                </div>
+              )}
+
+              {/* Input Area */}
               <div className="flex gap-2">
                 <Input
-                  placeholder="Describe your emergency (e.g., 'burn', 'choking', 'chest pain')..."
+                  placeholder={conversation.length > 0 ? "Add more details or ask a follow-up question..." : "Describe your emergency (e.g., 'burn', 'choking', 'chest pain')..."}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
@@ -251,13 +302,14 @@ export const MedicalEmergency = ({ className }: MedicalEmergencyProps) => {
                 </div>
               )}
               
-              {response && (
-                <div className="p-4 bg-muted rounded-lg border border-border animate-in slide-in-from-bottom-2 duration-300">
-                  <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">{response}</p>
+              {isLoading && (
+                <div className="flex items-center gap-2 p-3 bg-primary/10 rounded-lg border border-primary/20 animate-in fade-in duration-200">
+                  <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                  <p className="text-xs text-foreground font-medium">Getting AI assistance...</p>
                 </div>
               )}
               
-              {!response && !isLoading && !isRecording && !isTranscribing && (
+              {conversation.length === 0 && !isLoading && !isRecording && !isTranscribing && (
                 <div className="p-3 bg-emergency/5 rounded-lg border border-emergency/20">
                   <p className="text-xs text-muted-foreground">
                     ⚠️ For life-threatening emergencies, call <strong className="text-emergency">112</strong> (National Emergency) or <strong className="text-emergency">102</strong> (Ambulance) immediately
